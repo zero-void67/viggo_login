@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#050805" />
+  <title>VIGGO_OS // UNKNOWN</title>
+  <style>
+    :root {
+      --bg: #020402;
+      --panel: rgba(0, 8, 2, 0.88);
+      --text: #baffba;
+      --text-soft: #86ff86;
+      --dim: #5e9f5e;
+      --line: rgba(128, 255, 128, 0.58);
+      --line-soft: rgba(128, 255, 128, 0.18);
+      --shadow: 0 0 18px rgba(82, 255, 82, 0.30), 0 0 70px rgba(82, 255, 82, 0.14);
+      --danger: #ff2626;
+      --danger-soft: #ff9090;
+      --red-line: rgba(255, 42, 42, 0.76);
+      --red-soft: rgba(255, 42, 42, 0.18);
+      --red-shadow: 0 0 20px rgba(255, 0, 0, 0.50), 0 0 92px rgba(255, 0, 0, 0.24);
+      --font: "Courier New", Courier, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      overflow: hidden;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 50% 34%, rgba(93, 255, 93, 0.08), transparent 31rem),
+        radial-gradient(circle at 16% 22%, rgba(95, 255, 160, 0.05), transparent 18rem),
+        #020402;
+      text-shadow: 0 0 7px rgba(186, 255, 186, 0.46);
+      transition: background 650ms ease, color 650ms ease, text-shadow 650ms ease;
+    }
+
+    body.breach {
+      background:
+        radial-gradient(circle at 50% 34%, rgba(255, 0, 0, 0.18), transparent 31rem),
+        radial-gradient(circle at 16% 22%, rgba(255, 0, 0, 0.09), transparent 18rem),
+        #070000;
+      color: #ffd0d0;
+      text-shadow: 0 0 9px rgba(255, 32, 32, 0.82);
+      animation: bodyGlitch 900ms steps(2, end) infinite;
+    }
+
+    @keyframes bodyGlitch {
+      0%, 100% { filter: none; }
+      27% { filter: contrast(1.22) brightness(1.02); }
+      28% { filter: contrast(1.9) hue-rotate(-8deg); }
+      29% { filter: none; }
+      72% { filter: saturate(1.5); }
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(255,255,255,0.028) 50%, rgba(0,0,0,0.13) 50%),
+        linear-gradient(90deg, rgba(255,0,0,0.022), rgba(0,255,0,0.012), rgba(0,0,255,0.022));
+      background-size: 100% 4px, 7px 100%;
+      mix-blend-mode: screen;
+      opacity: 0.68;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 2001;
+      pointer-events: none;
+      background: radial-gradient(circle at center, transparent 48%, rgba(0,0,0,0.48) 100%);
+    }
+
+    .noise {
+      position: fixed;
+      inset: -20%;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.12;
+      background-image:
+        repeating-radial-gradient(circle at 20% 30%, rgba(255,255,255,0.25) 0 1px, transparent 1px 3px),
+        repeating-linear-gradient(90deg, transparent 0 9px, rgba(255,255,255,0.06) 10px, transparent 11px);
+      animation: noiseMove 240ms steps(3, end) infinite;
+    }
+
+    body.breach .noise { opacity: 0.25; }
+
+    @keyframes noiseMove {
+      0% { transform: translate3d(0,0,0); }
+      25% { transform: translate3d(-2%,1%,0); }
+      50% { transform: translate3d(2%,-1%,0); }
+      75% { transform: translate3d(1%,2%,0); }
+      100% { transform: translate3d(0,0,0); }
+    }
+
+    .shell {
+      position: relative;
+      z-index: 5;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: clamp(14px, 3vw, 32px);
+    }
+
+    .terminal {
+      width: min(920px, 100%);
+      max-height: calc(100svh - 28px);
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(3, 18, 3, 0.92), rgba(0, 4, 0, 0.88));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(3px);
+      overflow: hidden;
+      transition: border-color 650ms ease, box-shadow 650ms ease, background 650ms ease;
+    }
+
+    body.breach .terminal {
+      border-color: var(--red-line);
+      background: linear-gradient(180deg, rgba(24, 0, 0, 0.94), rgba(5, 0, 0, 0.90));
+      box-shadow: var(--red-shadow);
+    }
+
+    .bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 38px;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--line-soft);
+      background: rgba(140, 255, 140, 0.045);
+      letter-spacing: 0.08em;
+      font-size: clamp(10px, 2.4vw, 12px);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    body.breach .bar {
+      border-bottom-color: var(--red-soft);
+      background: rgba(255, 0, 0, 0.075);
+      color: var(--danger-soft);
+    }
+
+    .lights {
+      display: flex;
+      gap: 6px;
+      flex: 0 0 auto;
+    }
+
+    .light {
+      width: 8px;
+      height: 8px;
+      border: 1px solid currentColor;
+      opacity: 0.75;
+    }
+
+    .screen {
+      flex: 1;
+      overflow: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--line) transparent;
+      padding: clamp(16px, 4vw, 30px);
+    }
+
+    .screen::-webkit-scrollbar { width: 6px; }
+    .screen::-webkit-scrollbar-thumb { background: var(--line); }
+
+    .brand {
+      display: grid;
+      gap: 6px;
+      margin-bottom: clamp(18px, 3vw, 30px);
+    }
+
+    .system-name {
+      font-size: clamp(18px, 7vw, 46px);
+      line-height: 0.95;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    .subline {
+      color: var(--text-soft);
+      font-size: clamp(11px, 2.8vw, 14px);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    body.breach .subline,
+    body.breach .system-name {
+      color: var(--danger-soft);
+    }
+
+    .log {
+      min-height: 250px;
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      font-size: clamp(12px, 3.4vw, 15px);
+      line-height: 1.45;
+      letter-spacing: 0.035em;
+    }
+
+    .line {
+      min-height: 1.35em;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 220ms ease, transform 220ms ease, color 220ms ease;
+      word-break: break-word;
+    }
+
+    .line.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .line.warning { color: #ffcf70; }
+    .line.danger { color: var(--danger-soft); }
+    .line.ok { color: #d6ffd6; }
+    .line.dim { color: var(--dim); }
+
+    body.breach .line.warning,
+    body.breach .line.danger,
+    body.breach .line.ok,
+    body.breach .line.dim,
+    body.breach .line {
+      color: #ffbaba;
+    }
+
+    .prompt {
+      display: inline-block;
+      color: inherit;
+    }
+
+    .cursor::after {
+      content: "_";
+      display: inline-block;
+      margin-left: 2px;
+      animation: blink 800ms steps(1, end) infinite;
+    }
+
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-top: 1px solid var(--line-soft);
+      color: var(--dim);
+      background: rgba(0, 0, 0, 0.28);
+      font-size: clamp(9px, 2.4vw, 11px);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    body.breach .footer {
+      color: var(--danger-soft);
+      border-top-color: var(--red-soft);
+    }
+
+    .skull-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 12;
+      pointer-events: none;
+      overflow: hidden;
+      display: none;
+    }
+
+    body.breach .skull-layer { display: block; }
+
+    .skull {
+      position: absolute;
+      top: -80px;
+      color: rgba(255, 32, 32, 0.86);
+      font-size: var(--size);
+      text-shadow: 0 0 8px rgba(255,0,0,0.75), 0 0 22px rgba(255,0,0,0.35);
+      animation: skullFall var(--duration) linear forwards;
+      opacity: 0.88;
+    }
+
+    @keyframes skullFall {
+      from { transform: translate3d(var(--x), -90px, 0) rotate(0deg); opacity: 0; }
+      6% { opacity: 0.95; }
+      to { transform: translate3d(calc(var(--x) + var(--drift)), calc(100svh + 110px), 0) rotate(var(--rotate)); opacity: 0; }
+    }
+
+    .popup-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      pointer-events: none;
+    }
+
+    .popup {
+      position: fixed;
+      width: min(310px, calc(100vw - 28px));
+      border: 1px solid var(--red-line);
+      background: rgba(18, 0, 0, 0.96);
+      color: #ffd6d6;
+      box-shadow: 0 0 16px rgba(255, 0, 0, 0.55), 0 0 45px rgba(255, 0, 0, 0.24);
+      opacity: 0;
+      transform: scale(0.94) translateY(12px);
+      animation: popupIn 180ms ease forwards, popupShake 520ms steps(2, end) infinite 190ms;
+      pointer-events: none;
+    }
+
+    @keyframes popupIn {
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes popupShake {
+      0%, 100% { translate: 0 0; }
+      20% { translate: -1px 1px; }
+      40% { translate: 2px -1px; }
+      60% { translate: -2px -1px; }
+      80% { translate: 1px 2px; }
+    }
+
+    .popup-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--red-soft);
+      background: rgba(255, 0, 0, 0.16);
+      color: #ffffff;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .popup-x {
+      border: 1px solid rgba(255,255,255,0.5);
+      width: 16px;
+      height: 16px;
+      display: grid;
+      place-items: center;
+      line-height: 1;
+      font-size: 12px;
+    }
+
+    .popup-body {
+      padding: 13px 12px 14px;
+      font-size: 13px;
+      line-height: 1.4;
+      display: grid;
+      gap: 8px;
+    }
+
+    .popup-big {
+      font-size: 34px;
+      line-height: 1;
+      text-align: center;
+      color: #ff4b4b;
+      text-shadow: 0 0 18px rgba(255,0,0,0.75);
+    }
+
+    .flash {
+      position: fixed;
+      inset: 0;
+      z-index: 25;
+      pointer-events: none;
+      background: rgba(255, 0, 0, 0.0);
+    }
+
+    body.breach .flash {
+      animation: redFlash 1300ms steps(2, end) infinite;
+    }
+
+    @keyframes redFlash {
+      0%, 100% { background: rgba(255,0,0,0); }
+      12% { background: rgba(255,0,0,0.08); }
+      13% { background: rgba(255,0,0,0); }
+      44% { background: rgba(255,0,0,0.06); }
+      45% { background: rgba(255,0,0,0); }
+    }
+
+    .mega-warning {
+      position: fixed;
+      inset: auto 0 8svh 0;
+      z-index: 28;
+      display: none;
+      justify-content: center;
+      padding: 0 16px;
+      pointer-events: none;
+    }
+
+    body.breach .mega-warning { display: flex; }
+
+    .mega-warning span {
+      border: 1px solid var(--red-line);
+      background: rgba(12, 0, 0, 0.88);
+      color: #fff;
+      box-shadow: var(--red-shadow);
+      padding: 12px 16px;
+      font-size: clamp(14px, 4.2vw, 24px);
+      letter-spacing: 0.15em;
+      text-align: center;
+      text-transform: uppercase;
+      animation: warningPulse 480ms steps(2, end) infinite;
+    }
+
+    @keyframes warningPulse {
+      50% { color: var(--danger); transform: translateX(1px); }
+    }
+
+    @media (max-width: 560px) {
+      .shell { align-items: start; padding: 10px; }
+      .terminal { max-height: calc(100svh - 20px); }
+      .bar { min-height: 34px; padding: 0 9px; }
+      .screen { padding: 16px 13px 18px; }
+      .brand { margin-bottom: 16px; }
+      .log { gap: 8px; min-height: 300px; }
+      .footer { align-items: flex-start; flex-direction: column; gap: 5px; }
+      .popup { width: min(286px, calc(100vw - 18px)); }
+      .popup-body { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="skull-layer" id="skullLayer" aria-hidden="true"></div>
+  <div class="popup-layer" id="popupLayer" aria-hidden="true"></div>
+  <div class="flash" aria-hidden="true"></div>
+  <div class="mega-warning" aria-hidden="true"><span>YOU ARE BEING HACKED</span></div>
+
+  <main class="shell">
+    <section class="terminal" aria-label="VIGGO OS terminal screen">
+      <header class="bar">
+        <div class="lights" aria-hidden="true">
+          <span class="light"></span>
+          <span class="light"></span>
+          <span class="light"></span>
+        </div>
+        <div id="barTitle">VIGGO_OS // SECURE LOGIN NODE</div>
+        <div id="barStatus">IDLE</div>
+      </header>
+
+      <div class="screen">
+        <div class="brand">
+          <div class="system-name" id="systemName">VIGGO_OS</div>
+          <div class="subline" id="subline">encrypted access terminal</div>
+        </div>
+        <div class="log" id="log" aria-live="polite"></div>
+      </div>
+
+      <footer class="footer">
+        <span id="footerLeft">LOGIN_SEQUENCE: WAITING</span>
+        <span id="footerRight">CONNECTION: LOCALHOST</span>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    const log = document.getElementById('log');
+    const barTitle = document.getElementById('barTitle');
+    const barStatus = document.getElementById('barStatus');
+    const systemName = document.getElementById('systemName');
+    const subline = document.getElementById('subline');
+    const footerLeft = document.getElementById('footerLeft');
+    const footerRight = document.getElementById('footerRight');
+    const skullLayer = document.getElementById('skullLayer');
+    const popupLayer = document.getElementById('popupLayer');
+
+    const bootLines = [
+      { text: 'BOOTING SECURE LOGIN INTERFACE...', className: 'ok', wait: 520 },
+      { text: 'LOADING /sys/auth/kernel.bin...........[OK]', className: 'ok', wait: 620 },
+      { text: 'LOADING /usr/keys/session.lock.........[OK]', className: 'ok', wait: 560 },
+      { text: 'LOADING /home/viggo/access.db..........[OK]', className: 'ok', wait: 610 },
+      { text: 'SCANNING REMOTE VISITOR SIGNATURE......[OK]', className: 'ok', wait: 680 },
+      { text: 'REQUESTING USER IDENTIFICATION...', className: 'dim', wait: 740 },
+      { text: 'LOGIN REQUIRED', className: 'warning', wait: 560 },
+      { text: 'VIGGO_OS:/login$ ', className: 'ok', wait: 260, type: 'prompt' },
+      { text: 'UNKNOWN', className: 'danger', wait: 760, type: 'typed' },
+      { text: 'VISITOR_ID: UNKNOWN', className: 'danger', wait: 520 },
+      { text: 'ACCESS LEVEL: NONE', className: 'danger', wait: 420 },
+      { text: 'AUTHENTICATION FAILED', className: 'danger', wait: 500 },
+      { text: 'INTRUSION DETECTED', className: 'danger', wait: 520 },
+      { text: 'RED PROTOCOL ENABLED', className: 'danger', wait: 420 },
+      { text: 'SYSTEM LOCKDOWN FAILED', className: 'danger', wait: 380 },
+      { text: 'BREACH BREACH BREACH BREACH BREACH', className: 'danger', wait: 300 }
+    ];
+
+    const popupMessages = [
+      ['CRITICAL ERROR', 'UNKNOWN USER DETECTED'],
+      ['SECURITY BREACH', 'ACCESS DENIED'],
+      ['SYSTEM WARNING', 'YOU ARE BEING HACKED'],
+      ['RED PROTOCOL', 'LOCKDOWN FAILED'],
+      ['TRACE ACTIVE', 'SIGNATURE EXPOSED'],
+      ['FATAL EXCEPTION', 'IDENTITY UNKNOWN'],
+      ['VIGGO_OS ALERT', 'UNAUTHORIZED PRESENCE'],
+      ['BREACH DETECTED', 'DO NOT TRUST THIS DEVICE'],
+      ['MEMORY LEAK', 'FEAR MODULE ACTIVE'],
+      ['HOSTILE LOGIN', 'SESSION HIJACKED']
+    ];
+
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function addLine(text, className = '') {
+      const line = document.createElement('div');
+      line.className = `line ${className}`.trim();
+      line.textContent = text;
+      log.appendChild(line);
+      requestAnimationFrame(() => line.classList.add('show'));
+      log.parentElement.scrollTop = log.parentElement.scrollHeight;
+      return line;
+    }
+
+    async function typeText(target, text, speed = 58) {
+      target.classList.add('cursor');
+      for (const char of text) {
+        target.textContent += char;
+        await wait(speed + Math.random() * 40);
+      }
+      await wait(180);
+      target.classList.remove('cursor');
+    }
+
+    async function runBoot() {
+      for (const item of bootLines) {
+        if (item.type === 'prompt') {
+          const line = addLine(item.text, item.className);
+          line.classList.add('prompt', 'cursor');
+          await wait(item.wait);
+          line.classList.remove('cursor');
+          continue;
+        }
+
+        if (item.type === 'typed') {
+          const line = addLine('', item.className);
+          await typeText(line, item.text);
+          await wait(item.wait);
+          continue;
+        }
+
+        addLine(item.text, item.className);
+        await wait(item.wait);
+      }
+
+      startBreach();
+    }
+
+    function startBreach() {
+      document.body.classList.add('breach');
+      barTitle.textContent = 'VIGGO_OS // BREACH MODE';
+      barStatus.textContent = 'COMPROMISED';
+      systemName.textContent = 'UNKNOWN';
+      subline.textContent = 'unauthorized access detected';
+      footerLeft.textContent = 'LOGIN_SEQUENCE: CORRUPTED';
+      footerRight.textContent = 'CONNECTION: EXPOSED';
+
+      for (let i = 0; i < 14; i++) setTimeout(spawnSkull, i * 140);
+      setInterval(spawnSkull, 125);
+
+      for (let i = 0; i < 9; i++) setTimeout(spawnPopup, i * 310);
+      setInterval(spawnPopup, 850);
+
+      setInterval(() => {
+        const warnings = [
+          'YOU ARE BEING HACKED',
+          'UNKNOWN USER DETECTED',
+          'ACCESS DENIED',
+          'SYSTEM COMPROMISED',
+          'RED PROTOCOL ACTIVE',
+          'BREACH BREACH BREACH'
+        ];
+        addLine(warnings[Math.floor(Math.random() * warnings.length)], 'danger');
+      }, 650);
+    }
+
+    function spawnSkull() {
+      const skull = document.createElement('div');
+      skull.className = 'skull';
+      skull.textContent = Math.random() > 0.18 ? '☠' : '✖';
+      skull.style.setProperty('--x', `${Math.random() * 100}vw`);
+      skull.style.setProperty('--drift', `${(Math.random() * 90) - 45}px`);
+      skull.style.setProperty('--rotate', `${(Math.random() * 360) - 180}deg`);
+      skull.style.setProperty('--duration', `${2.4 + Math.random() * 3.2}s`);
+      skull.style.setProperty('--size', `${18 + Math.random() * 38}px`);
+      skullLayer.appendChild(skull);
+      setTimeout(() => skull.remove(), 6200);
+    }
+
+    function spawnPopup() {
+      const [title, message] = popupMessages[Math.floor(Math.random() * popupMessages.length)];
+      const popup = document.createElement('div');
+      popup.className = 'popup';
+
+      const margin = 12;
+      const width = Math.min(310, window.innerWidth - 28);
+      const height = 154;
+      const xMax = Math.max(margin, window.innerWidth - width - margin);
+      const yMax = Math.max(margin, window.innerHeight - height - margin);
+      const x = margin + Math.random() * (xMax - margin);
+      const y = margin + Math.random() * (yMax - margin);
+
+      popup.style.left = `${x}px`;
+      popup.style.top = `${y}px`;
+      popup.innerHTML = `
+        <div class="popup-title"><span>${title}</span><span class="popup-x">X</span></div>
+        <div class="popup-body">
+          <div class="popup-big">☠</div>
+          <div>${message}</div>
+          <div>SESSION STATUS: COMPROMISED</div>
+        </div>
+      `;
+
+      popupLayer.appendChild(popup);
+      setTimeout(() => popup.remove(), 4300 + Math.random() * 1400);
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(runBoot, 420);
+    });
+  </script>
+</body>
+</html>
